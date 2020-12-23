@@ -80,37 +80,54 @@ namespace CryptoLib
             var keyBytesLength = keyBytes.Length;
 
             var byteList = new List<byte> ();
-            var keyIndex = 0;
-            foreach (var b in plainBytes)
+            // var keyIndex = 0;
+            // foreach (var b in plainBytes)
+            // {
+            //     byteList.Add ((byte) (keyBytes[keyIndex] ^ b));
+            //     if (++keyIndex > key.Length - 1)
+            //     {
+            //         keyIndex = 0;
+            //     }
+            // }
+            var result = XorByteArray (keyBytes, plainBytes);
+            return HexEncode (result);
+        }
+
+        public static byte[] XorByteArray (byte[] key, byte[] buffer)
+        {
+            var output = new byte[buffer.Length];
+            var i = 0;
+            for (var j = 0; j < buffer.Length; ++j)
             {
-                byteList.Add ((byte) (keyBytes[keyIndex] ^ b));
-                if (++keyIndex > key.Length - 1)
+                output[j] = (byte) (buffer[j] ^ key[i]);
+                i++;
+                if (i == key.Length)
                 {
-                    keyIndex = 0;
+                    i = 0;
                 }
             }
-            return HexEncode (byteList.ToArray ());
+            return output;
         }
 
         public static int HammingDistance (this string thisString, string stringToCompare, Encoding encoding)
         {
             if (thisString.Length != stringToCompare.Length)
             {
-                throw new CryptoLabException("Strings must be the same length to compute hamming distance");
+                throw new CryptoLabException ("Strings must be the same length to compute hamming distance");
             }
-            var thisByteArray = encoding.GetBytes(thisString);
-            var byteArraytoCompare = encoding.GetBytes(stringToCompare);
+            var thisByteArray = encoding.GetBytes (thisString);
+            var byteArraytoCompare = encoding.GetBytes (stringToCompare);
 
-            return thisByteArray.HammingDistance(byteArraytoCompare);
+            return thisByteArray.HammingDistance (byteArraytoCompare);
         }
 
-        public static int HammingDistance(this byte[] thisByteArray, byte[] byteArraytoCompare)
+        public static int HammingDistance (this byte[] thisByteArray, byte[] byteArraytoCompare)
         {
             var hammingDistance = 0;
             for (var i = 0; i < thisByteArray.Length; ++i)
             {
                 var xoredByte = thisByteArray[i] ^ byteArraytoCompare[i];
-                hammingDistance += xoredByte.CountBits();
+                hammingDistance += xoredByte.CountBits ();
             }
             return hammingDistance;
         }
@@ -125,5 +142,6 @@ namespace CryptoLib
             }
             return count;
         }
+
     }
 }

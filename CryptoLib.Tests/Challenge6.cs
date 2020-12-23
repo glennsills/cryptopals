@@ -54,7 +54,7 @@ namespace CryptoLib.Tests
             var cryptoText = File.ReadAllText (GetTestFilePath ("../../../challenge6.txt"));
             var cut = new HexXorCracker ();
             var result = cut.GetKeySize (cryptoText, Encoding.ASCII);
-            Assert.True (result >= 2 && result <= 40);
+            Assert.Equal(39, result.Count);
         }
 
         public string GetTestFilePath (string relativePath)

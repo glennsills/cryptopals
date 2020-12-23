@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CryptoLib
@@ -33,25 +34,24 @@ namespace CryptoLib
             return sortedListOfResults[topScore];
         }
 
-        public int GetKeySize (string inputFileData, Encoding encoding)
+        public (string key, string clearText) Crack (string cryptoText, Encoding encoding, int keySize)
         {
-            var lowestNormalizedDifference = float.MaxValue;
-            var bestKeySize = -1;
+            throw new NotImplementedException ();
+        }
+
+        public IList<Tuple<int, float>> GetKeySize (string inputFileData, Encoding encoding)
+        {
+            var keySizeList = new List<Tuple<int, float>> ();
             var bytes = encoding.GetBytes (inputFileData);
             for (var keySize = 2; keySize <= 40; ++keySize)
             {
                 var firstKeysizeOfBytes = GetKeysizeOfBytes (bytes, keySize, 0);
                 var secondKeysizeOfBytes = GetKeysizeOfBytes (bytes, keySize, keySize);
                 var hammingDistance = firstKeysizeOfBytes.HammingDistance (secondKeysizeOfBytes);
-                float normalizedHammingDistance = hammingDistance / keySize;
-                if (normalizedHammingDistance < lowestNormalizedDifference)
-                {
-                    lowestNormalizedDifference = normalizedHammingDistance;
-                    bestKeySize = keySize;
-                }
-
+                float normalizedHammingDistance = hammingDistance / (float) keySize;
+                keySizeList.Add (new Tuple<int, float> (keySize, normalizedHammingDistance));
             }
-            return bestKeySize;
+            return keySizeList.OrderBy (i => i.Item2).ToList ();
         }
 
         public byte[] GetKeysizeOfBytes (byte[] bytes, int keysize, int offset)
@@ -69,6 +69,19 @@ namespace CryptoLib
             var trialPlainText = XorByteArrayToString (key, cypherBytes);
             var score = scoreCharacters (trialPlainText);
             return (score, key, trialPlainText);
+        }
+
+        private (int score, byte[] key, string plainText) XorWithKey (byte[] key, byte[] cypherBytes)
+        {
+            for (var i = 0; i < cypherBytes.Length / key.Length; i += key.Length)
+            {
+                for (var j = 0; j < key.Length; ++j)
+                {
+
+                }
+
+            }
+            throw new NotImplementedException ();
         }
 
         private int scoreCharacters (string trialPlainText)
@@ -91,6 +104,22 @@ namespace CryptoLib
                 outputBuilder.Append (Convert.ToChar (b ^ key));
             }
             return outputBuilder.ToString ();;
+        }
+
+        private byte[] XorByteArray (byte[] key, byte[] buffer)
+        {
+            var output = new byte[buffer.Length];
+            var i = 0;
+            for (var j = 0; j < buffer.Length; ++j)
+            {
+                output[j] = (byte) (buffer[j] ^ key[i]);
+                i++;
+                if (i == key.Length)
+                {
+                    i = 0;
+                }
+            }
+            return output;
         }
     }
 }

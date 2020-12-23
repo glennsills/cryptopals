@@ -20,5 +20,6 @@ I go crazy when I hear a cymbal";
             var result = CryptoUtility.RepeatingKeyXor (key, input);
             Assert.Equal (expected, result);
         }
+
     }
 }
